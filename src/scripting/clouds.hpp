@@ -25,58 +25,91 @@ class CloudParticleSystem;
 
 namespace scripting {
 
-/**
- * @summary A ""CloudParticleSystem"" that was given a name can be controlled by scripts.
- * @instances A ""CloudParticleSystem"" is instantiated by placing a definition inside a level.
-              It can then be accessed by its name from a script or via ""sector.name"" from the console.
- */
-class Clouds final
+  /**
+   * @summary A ""CloudParticleSystem"" that was given a name can be controlled by scripts.
+   * @instances A ""CloudParticleSystem"" is instantiated by placing a definition inside a level.
+                It can then be accessed by its name from a script or via ""sector.name"" from the console.
+   */
+  class Clouds final
 #ifndef SCRIPTING_API
-  : public GameObject<::CloudParticleSystem>
+    : public GameObject<::CloudParticleSystem>
 #endif
-{
-#ifndef SCRIPTING_API
-public:
-  using GameObject::GameObject;
+  {
+  #ifndef SCRIPTING_API
+  public:
+    using GameObject::GameObject;
 
-private:
-  Clouds(const Clouds&) = delete;
-  Clouds& operator=(const Clouds&) = delete;
-#endif
+  private:
+    Clouds(const Clouds&) = delete;
+    Clouds& operator=(const Clouds&) = delete;
+  #endif
 
-public:
-  /**
-   * Enables/disables the system.
-   * @param bool $enable
-   */
-  void set_enabled(bool enable);
-  /**
-   * Returns ""true"" if the system is enabled.
-   */
-  bool get_enabled() const;
+  public:
+    /**
+     * Enables/disables the system.
+     * @param bool $enable
+     */
+    void set_enabled(bool enable);
 
-  /**
-   * Smoothly changes the rain speed to the given value in ""time"" seconds.
-   * @param float $speed
-   * @param float $time
-   */
-  void fade_speed(float speed, float time);
+    /**
+     * Returns ""true"" if the system is enabled.
+     */
+    bool get_enabled() const;
 
-  /**
-   * Smoothly changes the amount of particles to the given value in ""time"" seconds.
-   * @param int $amount
-   * @param float $time
-   * @param float $time_between
-   */
-  void fade_amount(int amount, float time, float time_between);
+    /**
+     * Smoothly changes the clouds' x speed to the given value in ""time"" seconds.
+     * @param float $speed
+     * @param float $time
+     */
+    void fade_speed(float speed, float time);
 
-  /**
-   * Smoothly changes the amount of particles to the given value in ""time"" seconds.
-   * @param int $amount
-   * @param float $time
-   */
-  void set_amount(int amount, float time);
-};
+    /**
+     * Smoothly changes the clouds' speed's x and y speeds to the given values in ""time"" seconds.
+     * @param float $speed_x
+     * @param float $speed_y
+     * @param float $time
+     */
+    void fade_speed(float speed_x, float speed_y, float time);
+
+    /**
+     * Smoothly changes the amount of particles to the given value in ""time"" seconds.
+     * @param int $amount
+     * @param float $time
+     * @param float $time_between
+     */
+    void fade_amount(int amount, float time, float time_between);
+
+    /**
+     * Smoothly changes the amount of particles to the given value in ""time"" seconds.
+     * @param int $amount
+     * @param float $time
+     */
+    void set_amount(int amount, float time);
+
+    /**
+     * Sets the horizontal speed of the clouds.
+     * @param float $speed
+     */
+    void set_x_speed(float speed);
+
+    /**
+     * Gets the horizontal speed of the clouds.
+     * @return float
+     */
+    float get_x_speed() const;
+
+    /**
+     * Sets the vertical speed of the clouds.
+     * @param float $speed
+     */
+    void set_y_speed(float speed);
+
+    /**
+     * Gets the vertical speed of the clouds.
+     * @return float
+     */
+    float get_y_speed() const;
+  };
 
 } // namespace scripting
 

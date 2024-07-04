@@ -19,35 +19,65 @@
 
 namespace scripting {
 
-void Clouds::set_enabled(bool enable)
-{
-  SCRIPT_GUARD_VOID;
-  object.set_enabled(enable);
-}
+  void Clouds::set_enabled(bool enable)
+  {
+    SCRIPT_GUARD_VOID;
+    object.set_enabled(enable);
+  }
 
-bool Clouds::get_enabled() const
-{
-  SCRIPT_GUARD_DEFAULT;
-  return object.get_enabled();
-}
+  bool Clouds::get_enabled() const
+  {
+    SCRIPT_GUARD_DEFAULT;
+    return object.get_enabled();
+  }
 
-void Clouds::fade_speed(float speed, float time)
-{
-  SCRIPT_GUARD_VOID;
-  object.fade_speed(speed, time);
-}
+  void Clouds::fade_speed(float speed, float time)
+  {
+    SCRIPT_GUARD_VOID;
+    object.fade_speed(speed, 0.f, time);
+  }
 
-void Clouds::fade_amount(int amount, float time, float time_between)
-{
-  SCRIPT_GUARD_VOID;
-  object.fade_amount(amount, time, time_between);
-}
+  void Clouds::fade_speed(float speed_x, float speed_y, float time)
+  {
+    SCRIPT_GUARD_VOID;
+    object.fade_speed(speed_x, speed_y, time);
+  }
 
-void Clouds::set_amount(int amount, float time)
-{
-  SCRIPT_GUARD_VOID;
-  object.fade_amount(amount, time);
-}
+  void Clouds::fade_amount(int amount, float time, float time_between)
+  {
+    SCRIPT_GUARD_VOID;
+    object.fade_amount(amount, time, time_between);
+  }
+
+  void Clouds::set_amount(int amount, float time)
+  {
+    SCRIPT_GUARD_VOID;
+    object.fade_amount(amount, time);
+  }
+
+  void Clouds::set_x_speed(float speed)
+  {
+    SCRIPT_GUARD_VOID;
+    object.set_x_speed(speed);
+  }
+
+  float Clouds::get_x_speed() const
+  {
+    SCRIPT_GUARD_DEFAULT;
+    return object.get_x_speed();
+  }
+
+  void Clouds::set_y_speed(float speed)
+  {
+    SCRIPT_GUARD_VOID;
+    object.set_y_speed(speed);
+  }
+
+  float Clouds::get_y_speed() const
+  {
+    SCRIPT_GUARD_DEFAULT;
+    return object.get_y_speed();
+  }
 
 } // namespace scripting
 

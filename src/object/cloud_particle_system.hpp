@@ -1,5 +1,6 @@
 //  SuperTux
 //  Copyright (C) 2006 Matthias Braun <matze@braunis.de>
+//  Copyright (C) 2024 bruhmoent
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -47,7 +48,7 @@ public:
     return "images/engine/editor/clouds.png";
   }
 
-  void fade_speed(float new_speed, float fade_time);
+  void fade_speed(float new_speed_x, float new_speed_y, float fade_time);
   void fade_amount(int new_amount, float fade_time, float time_between = 0.f);
 
   // Minimum and maximum multiplier for the amount of clouds
@@ -62,12 +63,39 @@ public:
     ExposedObject<CloudParticleSystem, scripting::Clouds>::unexpose(vm, table_idx);
   }
 
+  /**
+   * Sets the horizontal speed of the clouds.
+   * @param float $speed
+   */
+  void set_x_speed(float speed);
+
+  /**
+   * Gets the horizontal speed of the clouds.
+   * @return float
+   */
+  float get_x_speed() const;
+
+  /**
+   * Sets the vertical speed of the clouds.
+   * @param float $speed
+   */
+  void set_y_speed(float speed);
+
+  /**
+   * Gets the vertical speed of the clouds.
+   * @return float
+   */
+  float get_y_speed() const;
+
 private:
   /** Returns the amount that got inserted (In case max_amount got hit) */
   int add_clouds(int amount, float fade_time);
 
   /** Returns the amount that got removed (In case min_amount got hit) */
   int remove_clouds(int amount, float fade_time);
+
+  /** Apply fog effect based on the current amount of clouds */
+  void apply_fog_effect(DrawingContext& context);
 
 private:
   class CloudParticle : public Particle
@@ -86,12 +114,19 @@ private:
 
   SurfacePtr cloudimage;
 
-  float m_current_speed;
-  float m_target_speed;
-  float m_speed_fade_time_remaining;
+  float m_current_speed_x;
+  float m_target_speed_x;
+  float m_speed_fade_time_remaining_x;
+
+  float m_current_speed_y;
+  float m_target_speed_y;
+  float m_speed_fade_time_remaining_y;
 
   int m_current_amount;
   int m_current_real_amount;
+
+  const float fog_max_value = 1.0f;
+  const float fog_start_amount = 10.0f;
 
 private:
   CloudParticleSystem(const CloudParticleSystem&) = delete;

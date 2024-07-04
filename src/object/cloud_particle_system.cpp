@@ -1,5 +1,6 @@
 //  SuperTux
 //  Copyright (C) 2006 Matthias Braun <matze@braunis.de>
+//  Copyright (C) 2024 bruhmoent
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -31,11 +32,12 @@ CloudParticleSystem::CloudParticleSystem() :
   ParticleSystem(128),
   ExposedObject<CloudParticleSystem, scripting::Clouds>(this),
   cloudimage(Surface::from_file("images/particles/cloud.png")),
-
-  m_current_speed(1.f),
-  m_target_speed(1.f),
-  m_speed_fade_time_remaining(0.f),
-
+  m_current_speed_x(1.f),
+  m_target_speed_x(1.f),
+  m_speed_fade_time_remaining_x(0.f),
+  m_current_speed_y(0.f),
+  m_target_speed_y(0.f),
+  m_speed_fade_time_remaining_y(0.f),
   m_current_amount(15),
   m_current_real_amount(0)
 {
@@ -46,15 +48,18 @@ CloudParticleSystem::CloudParticleSystem(const ReaderMapping& reader) :
   ParticleSystem(reader, 128),
   ExposedObject<CloudParticleSystem, scripting::Clouds>(this),
   cloudimage(Surface::from_file("images/particles/cloud.png")),
-
-  m_current_speed(1.f),
-  m_target_speed(1.f),
-  m_speed_fade_time_remaining(0.f),
-
+  m_current_speed_x(1.f),
+  m_target_speed_x(1.f),
+  m_speed_fade_time_remaining_x(0.f),
+  m_current_speed_y(0.f),
+  m_target_speed_y(0.f),
+  m_speed_fade_time_remaining_y(0.f),
   m_current_amount(15),
   m_current_real_amount(0)
 {
   reader.get("intensity", m_current_amount);
+  reader.get("x_speed", m_current_speed_x);
+  reader.get("y_speed", m_current_speed_y);
   init();
 }
 
@@ -62,12 +67,37 @@ CloudParticleSystem::~CloudParticleSystem()
 {
 }
 
-void CloudParticleSystem::init()
+void
+CloudParticleSystem::init()
 {
-  virtual_width = 2000.0;
+  virtual_width = 2000.f;
 
   // Create some random clouds.
   add_clouds(m_current_amount, 0.f);
+}
+
+void
+CloudParticleSystem::set_x_speed(float speed)
+{
+  m_current_speed_x = speed;
+}
+
+float
+CloudParticleSystem::get_x_speed() const
+{
+  return m_current_speed_x;
+}
+
+void
+CloudParticleSystem::set_y_speed(float speed)
+{
+  m_current_speed_y = speed;
+}
+
+float
+CloudParticleSystem::get_y_speed() const
+{
+  return m_current_speed_y;
 }
 
 ObjectSettings CloudParticleSystem::get_settings()
@@ -75,27 +105,47 @@ ObjectSettings CloudParticleSystem::get_settings()
   ObjectSettings result = ParticleSystem::get_settings();
 
   result.add_int(_("Intensity"), &m_current_amount, "intensity", 15);
+  result.add_float(_("X Speed"), &m_current_speed_x, "x_speed", 1.f);
+  result.add_float(_("Y Speed"), &m_current_speed_y, "y_speed", 0.f);
 
-  result.reorder({"intensity", "enabled", "name"});
+  result.reorder({ "intensity", "x_speed", "y_speed", "enabled", "name" });
 
   return result;
 }
 
-
-void CloudParticleSystem::update(float dt_sec)
+void
+CloudParticleSystem::update(float dt_sec)
 {
   if (!enabled)
     return;
 
-  // Update speed.
-  if (m_speed_fade_time_remaining > 0.f) {
-    if (dt_sec >= m_speed_fade_time_remaining) {
-      m_current_speed = m_target_speed;
-      m_speed_fade_time_remaining = 0.f;
-    } else {
-      float amount = dt_sec / m_speed_fade_time_remaining;
-      m_current_speed += (m_target_speed - m_current_speed) * amount;
-      m_speed_fade_time_remaining -= dt_sec;
+  // Update X speed.
+  if (m_speed_fade_time_remaining_x > 0.f)
+  {
+    if (dt_sec >= m_speed_fade_time_remaining_x)
+    {
+      m_current_speed_x = m_target_speed_x;
+      m_speed_fade_time_remaining_x = 0.f;
+    } else
+    {
+      float amount = dt_sec / m_speed_fade_time_remaining_x;
+      m_current_speed_x += (m_target_speed_x - m_current_speed_x) * amount;
+      m_speed_fade_time_remaining_x -= dt_sec;
+    }
+  }
+
+  // Update Y speed.
+  if (m_speed_fade_time_remaining_y > 0.f)
+  {
+    if (dt_sec >= m_speed_fade_time_remaining_y)
+    {
+      m_current_speed_y = m_target_speed_y;
+      m_speed_fade_time_remaining_y = 0.f;
+    } else
+    {
+      float amount = dt_sec / m_speed_fade_time_remaining_y;
+      m_current_speed_y += (m_target_speed_y - m_current_speed_y) * amount;
+      m_speed_fade_time_remaining_y -= dt_sec;
     }
   }
 
@@ -104,11 +154,13 @@ void CloudParticleSystem::update(float dt_sec)
   auto screen_width = static_cast<float>(SCREEN_WIDTH) / scale;
   auto screen_height = static_cast<float>(SCREEN_HEIGHT) / scale;
 
-  for (auto& particle : particles) {
+  for (auto& particle : particles)
+  {
     auto cloudParticle = dynamic_cast<CloudParticle*>(particle.get());
     if (!cloudParticle)
       continue;
-    cloudParticle->pos.x += cloudParticle->speed * dt_sec * m_current_speed;
+    cloudParticle->pos.x += cloudParticle->speed * dt_sec * m_current_speed_x;
+    cloudParticle->pos.y += cloudParticle->speed * dt_sec * m_current_speed_y;
     while (cloudParticle->pos.x < cam.get_translation().x - static_cast<float>(cloudParticle->texture->get_width()))
       cloudParticle->pos.x += screen_width + static_cast<float>(cloudParticle->texture->get_width()) * 2.f;
     while (cloudParticle->pos.x > cam.get_translation().x + screen_width)
@@ -119,15 +171,18 @@ void CloudParticleSystem::update(float dt_sec)
       cloudParticle->pos.y -= screen_height + static_cast<float>(cloudParticle->texture->get_height()) * 2.f;
 
     // Update alpha.
-    if (cloudParticle->target_time_remaining > 0.f) {
-      if (dt_sec >= cloudParticle->target_time_remaining) {
+    if (cloudParticle->target_time_remaining > 0.f)
+    {
+      if (dt_sec >= cloudParticle->target_time_remaining)
+      {
         cloudParticle->alpha = cloudParticle->target_alpha;
         cloudParticle->target_time_remaining = 0.f;
         if (cloudParticle->alpha == 0.f) {
           // Remove this particle, but not at this point
           // as it would interfere with the iterator.
         }
-      } else {
+      } else
+      {
         float amount = dt_sec / cloudParticle->target_time_remaining;
         cloudParticle->alpha += (cloudParticle->target_alpha - cloudParticle->alpha) * amount;
         cloudParticle->target_time_remaining -= dt_sec;
@@ -138,7 +193,8 @@ void CloudParticleSystem::update(float dt_sec)
   // Clear dead clouds.
   // Iterate through the vector backwards to avoid affecting the index of elements
   // after removal, preventing buggy behavior.
-  for (int i = static_cast<int>(particles.size()) - 1; i >= 0; --i) {
+  for (int i = static_cast<int>(particles.size()) - 1; i >= 0; --i)
+  {
     auto particle = dynamic_cast<CloudParticle*>(particles.at(i).get());
     
     if (particle->target_alpha == 0.f && particle->target_time_remaining == 0.f)
@@ -146,7 +202,25 @@ void CloudParticleSystem::update(float dt_sec)
   }
 }
 
-int CloudParticleSystem::add_clouds(int amount, float fade_time)
+void
+CloudParticleSystem::apply_fog_effect(DrawingContext& context)
+{
+  float opacity = fog_max_value * (m_current_amount - fog_start_amount) / (max_amount - fog_start_amount);
+  if (opacity < 0.f)
+    opacity = 0.f;
+  if (opacity > 1.f)
+    opacity = 1.f;
+
+  context.push_transform();
+  context.set_translation(Vector(0, 0));
+  context.color().draw_filled_rect(context.get_rect(),
+    Color(0.3f, 0.38f, 0.4f, opacity),
+    199); // TODO: Change the hardcoded layer value with the cloud's layer
+  context.pop_transform();
+}
+
+int
+CloudParticleSystem::add_clouds(int amount, float fade_time)
 {
   int target_amount = m_current_real_amount + amount;
 
@@ -155,7 +229,8 @@ int CloudParticleSystem::add_clouds(int amount, float fade_time)
 
   int amount_to_add = target_amount - m_current_real_amount;
 
-  for (int i = 0; i < amount_to_add; ++i) {
+  for (int i = 0; i < amount_to_add; ++i)
+  {
     auto particle = std::make_unique<CloudParticle>();
     // Don't consider the camera, because the Sector might not exist yet
     // Instead, rely on update() to correct this when it will be called.
@@ -174,7 +249,8 @@ int CloudParticleSystem::add_clouds(int amount, float fade_time)
   return m_current_real_amount;
 }
 
-int CloudParticleSystem::remove_clouds(int amount, float fade_time)
+int
+CloudParticleSystem::remove_clouds(int amount, float fade_time)
 {
   int target_amount = m_current_real_amount - amount;
 
@@ -184,10 +260,12 @@ int CloudParticleSystem::remove_clouds(int amount, float fade_time)
   int amount_to_remove = m_current_real_amount - target_amount;
 
   int i = 0;
-  for (; i < amount_to_remove && i < static_cast<int>(particles.size()); ++i) {
+  for (; i < amount_to_remove && i < static_cast<int>(particles.size()); ++i)
+  {
   
     auto particle = dynamic_cast<CloudParticle*>(particles.at(i).get());
-    if (particle->target_alpha != 1.f || particle->target_time_remaining != 0.f) {
+    if (particle->target_alpha != 1.f || particle->target_time_remaining != 0.f)
+    {
       // Skip that one, it doesn't count.
       --i;
     } else {
@@ -199,21 +277,27 @@ int CloudParticleSystem::remove_clouds(int amount, float fade_time)
   return i;
 }
 
-void CloudParticleSystem::fade_speed(float new_speed, float fade_time)
+void
+CloudParticleSystem::fade_speed(float new_speed_x, float new_speed_y, float fade_time)
 {
   // No check for enabled; change the fading even if it's disabled.
 
   // If fade_time is 0 or smaller, update() will never change m_current_speed.
   if (fade_time <= 0.f)
   {
-    m_current_speed = new_speed;
+    m_current_speed_x = new_speed_x;
+    m_current_speed_y = new_speed_y;
   }
-  
-  m_target_speed = new_speed;
-  m_speed_fade_time_remaining = fade_time;
+
+  m_target_speed_x = new_speed_x;
+  m_speed_fade_time_remaining_x = fade_time;
+
+  m_target_speed_y = new_speed_y;
+  m_speed_fade_time_remaining_y = fade_time;
 }
 
-void CloudParticleSystem::fade_amount(int new_amount, float fade_time, float time_between)
+void
+CloudParticleSystem::fade_amount(int new_amount, float fade_time, float time_between)
 {
   // No check for enabled; change the fading even if it's disabled.
 
@@ -229,8 +313,8 @@ void CloudParticleSystem::fade_amount(int new_amount, float fade_time, float tim
   } // If delta is zero, there is nothing to do.
 }
 
-
-void CloudParticleSystem::draw(DrawingContext& context)
+void
+CloudParticleSystem::draw(DrawingContext& context)
 {
   if (!enabled)
     return;
@@ -240,12 +324,14 @@ void CloudParticleSystem::draw(DrawingContext& context)
   context.push_transform();
 
   std::unordered_map<SurfacePtr, SurfaceBatch> batches;
-  for (const auto& particle : particles) {
+  for (const auto& particle : particles)
+  {
 
     if(!region.contains(particle->pos))
       continue;
 
-    if (particle->alpha != 1.f) {
+    if (particle->alpha != 1.f)
+    {
       const auto& batch_it = batches.emplace(
           particle->texture->clone(),
           SurfaceBatch(
@@ -253,19 +339,22 @@ void CloudParticleSystem::draw(DrawingContext& context)
               Color(1.f, 1.f, 1.f, particle->alpha)
           ));
       batch_it.first->second.draw(particle->pos, particle->angle);
-    } else {
+    } else
+    {
       auto it = batches.find(particle->texture);
       if (it == batches.end()) {
         const auto& batch_it = batches.emplace(particle->texture,
           SurfaceBatch(particle->texture));
         batch_it.first->second.draw(particle->pos, particle->angle);
-      } else {
+      } else
+      {
         it->second.draw(particle->pos, particle->angle);
       }
     }
   }
 
-  for(auto& it : batches) {
+  for(auto& it : batches)
+  {
     auto& surface = it.first;
     auto& batch = it.second;
     // FIXME: What is the colour used for?
@@ -274,6 +363,7 @@ void CloudParticleSystem::draw(DrawingContext& context)
       batch.move_dstrects(), batch.move_angles(), batch.get_color(), z_pos);
   }
 
+  apply_fog_effect(context);
   context.pop_transform();
 }
 
