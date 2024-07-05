@@ -179,7 +179,8 @@ CloudParticleSystem::update(float dt_sec)
       {
         cloudParticle->alpha = cloudParticle->target_alpha;
         cloudParticle->target_time_remaining = 0.f;
-        if (cloudParticle->alpha == 0.f) {
+        if (cloudParticle->alpha == 0.f)
+        {
           // Remove this particle, but not at this point
           // as it would interfere with the iterator.
         }
@@ -269,7 +270,8 @@ CloudParticleSystem::remove_clouds(int amount, float fade_time)
       // Skip that one, it doesn't count.
       --i;
     }
-    else {
+    else
+    {
       particle->target_alpha = 0.f;
       particle->target_time_remaining = fade_time;
     }
