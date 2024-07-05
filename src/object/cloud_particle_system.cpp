@@ -126,7 +126,8 @@ CloudParticleSystem::update(float dt_sec)
     {
       m_current_speed_x = m_target_speed_x;
       m_speed_fade_time_remaining_x = 0.f;
-    } else
+    }
+    else
     {
       float amount = dt_sec / m_speed_fade_time_remaining_x;
       m_current_speed_x += (m_target_speed_x - m_current_speed_x) * amount;
@@ -141,7 +142,8 @@ CloudParticleSystem::update(float dt_sec)
     {
       m_current_speed_y = m_target_speed_y;
       m_speed_fade_time_remaining_y = 0.f;
-    } else
+    }
+    else
     {
       float amount = dt_sec / m_speed_fade_time_remaining_y;
       m_current_speed_y += (m_target_speed_y - m_current_speed_y) * amount;
@@ -181,7 +183,8 @@ CloudParticleSystem::update(float dt_sec)
           // Remove this particle, but not at this point
           // as it would interfere with the iterator.
         }
-      } else
+      }
+      else
       {
         float amount = dt_sec / cloudParticle->target_time_remaining;
         cloudParticle->alpha += (cloudParticle->target_alpha - cloudParticle->alpha) * amount;
@@ -205,11 +208,8 @@ CloudParticleSystem::update(float dt_sec)
 void
 CloudParticleSystem::apply_fog_effect(DrawingContext& context)
 {
-  float opacity = fog_max_value * (m_current_amount - fog_start_amount) / (max_amount - fog_start_amount);
-  if (opacity < 0.f)
-    opacity = 0.f;
-  if (opacity > 1.f)
-    opacity = 1.f;
+  float opacity = fog_max_value * static_cast<float>(m_current_amount - fog_start_amount) / static_cast<float>(max_amount - fog_start_amount);
+  opacity = std::clamp(opacity, 0.f, 1.f);
 
   context.push_transform();
   context.set_translation(Vector(0, 0));
@@ -268,7 +268,8 @@ CloudParticleSystem::remove_clouds(int amount, float fade_time)
     {
       // Skip that one, it doesn't count.
       --i;
-    } else {
+    }
+    else {
       particle->target_alpha = 0.f;
       particle->target_time_remaining = fade_time;
     }
@@ -339,14 +340,16 @@ CloudParticleSystem::draw(DrawingContext& context)
               Color(1.f, 1.f, 1.f, particle->alpha)
           ));
       batch_it.first->second.draw(particle->pos, particle->angle);
-    } else
+    }
+    else
     {
       auto it = batches.find(particle->texture);
       if (it == batches.end()) {
         const auto& batch_it = batches.emplace(particle->texture,
           SurfaceBatch(particle->texture));
         batch_it.first->second.draw(particle->pos, particle->angle);
-      } else
+      }
+      else
       {
         it->second.draw(particle->pos, particle->angle);
       }
