@@ -208,7 +208,7 @@ CloudParticleSystem::update(float dt_sec)
 void
 CloudParticleSystem::apply_fog_effect(DrawingContext& context)
 {
-  float opacity = fog_max_value * static_cast<float>(m_current_amount - fog_start_amount) / static_cast<float>(max_amount - fog_start_amount);
+  float opacity = fog_max_value * (static_cast<float>(m_current_amount) - static_cast<float>(fog_start_amount)) / (static_cast<float>(max_amount) - static_cast<float>(fog_start_amount));
   opacity = std::clamp(opacity, 0.f, 1.f);
 
   context.push_transform();
