@@ -28,7 +28,7 @@ public:
   static std::string display_name() { return _("Magic Spike"); }
   std::string get_display_name() const override { return display_name(); }
 
-  GameObjectClasses get_class_types() const override
+  inline GameObjectClasses get_class_types() const override
   {
     return MagicBlock::get_class_types().add(typeid(MagicSpike));
   }
