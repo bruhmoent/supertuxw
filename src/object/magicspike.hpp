@@ -37,7 +37,7 @@ public:
   void draw(DrawingContext& context) override;
 
 private:
-  void refresh(float dt_sec);
+  void refresh(float dt_sec) override;
   inline bool can_be_solid() const override
   {
     return true;
