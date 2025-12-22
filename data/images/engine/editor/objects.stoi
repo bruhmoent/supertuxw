@@ -304,6 +304,9 @@
     (class "magicblock")
     (icon "images/objects/magicblock/magicblock.png"))
   (object
+    (class "magicspike")
+    (icon "images/objects/magicspike/magicspike.png"))
+  (object
     (class "spotlight")
     (icon "images/objects/spotlight/spotlight_center.png"))
   (object

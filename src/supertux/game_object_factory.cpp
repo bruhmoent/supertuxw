@@ -115,6 +115,7 @@
 #include "object/level_time.hpp"
 #include "object/lit_object.hpp"
 #include "object/magicblock.hpp"
+#include "object/magicspike.hpp"
 #include "object/path.hpp"
 #include "object/path_gameobject.hpp"
 #include "object/particle_zone.hpp"
@@ -284,6 +285,7 @@ GameObjectFactory::init_factories()
   add_factory<LevelTime>("leveltime");
   add_factory<LitObject>("lit-object");
   add_factory<MagicBlock>("magicblock");
+  add_factory<MagicSpike>("magicspike");
   add_factory<ParticleZone>("particle-zone");
   add_factory<Platform>("platform");
   add_factory<PneumaticPlatform>("pneumatic-platform");

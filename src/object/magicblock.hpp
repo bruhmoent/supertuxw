@@ -27,10 +27,16 @@
 
 #include <memory>
 
-class MagicBlock final: public MovingSprite
+static constexpr float MIN_INTENSITY = 0.8f;
+static constexpr float ALPHA_SOLID = 0.7f;
+static constexpr float ALPHA_NONSOLID = 0.3f;
+static constexpr float MIN_SOLIDTIME = 1.0f;
+static constexpr float SWITCH_DELAY = 0.0f; /**< seconds to wait for stable conditions until switching solidity */
+
+class MagicBlock : public MovingSprite
 {
 public:
-  MagicBlock(const ReaderMapping& reader);
+  MagicBlock(const ReaderMapping& reader, const std::string& sprite_path = "images/objects/magicblock/magicblock.sprite");
 
   virtual bool collides(MovingObject& other, const CollisionHit& hit) const override;
   virtual HitResponse collision(MovingObject& other, const CollisionHit& hit) override;
@@ -47,21 +53,27 @@ public:
 
   virtual void on_flip(float height) override;
 
-private:
-  void set_trigger_color();
+protected:
+  virtual void refresh(float dt_sec);
+  virtual bool can_be_solid() const;
 
-private:
+protected:
   bool m_is_solid;
-  float m_trigger_red;
-  float m_trigger_green;
-  float m_trigger_blue;
   float m_solid_time;
-  float m_switch_delay; /**< seconds until switching solidity */
-  Rectf m_solid_box;
   Color m_color;
   std::shared_ptr<Color> m_light;
   Vector m_center;
+
+private:
+  float m_trigger_red;
+  float m_trigger_green;
+  float m_trigger_blue;
+  float m_switch_delay; /**< seconds until switching solidity */
+  Rectf m_solid_box;
   bool m_black;
+
+private:
+  void set_trigger_color();
 
 private:
   MagicBlock(const MagicBlock&) = delete;
