@@ -369,7 +369,8 @@ Dispenser::set_correct_action()
   }
 }
 
-void Dispenser::set_correct_colgroup()
+void
+Dispenser::set_correct_colgroup()
 {
   switch (m_type)
   {

@@ -17,26 +17,25 @@
 
 #pragma once
 
-#include "object/moving_sprite.hpp"
+#include "badguy/dispenser.hpp"
 #include "object/magic_object.hpp"
 
-class MagicSpike final : public MagicObject<MovingSprite>
+class MagicDispenser final : public MagicObject<Dispenser>
 {
 public:
-  MagicSpike(const ReaderMapping& reader);
-  static std::string class_name() { return "magicspike"; }
-  std::string get_class_name() const override { return class_name(); }
-  static std::string display_name() { return _("Magic Spike"); }
-  std::string get_display_name() const override { return display_name(); }
-  GameObjectClasses get_class_types() const override { return MovingSprite::get_class_types().add(typeid(MagicSpike)); }
+  MagicDispenser(const ReaderMapping& reader);
 
-  HitResponse collision(MovingObject& other, const CollisionHit& hit) override;
+  void active_update(float dt_sec) override;
+  static std::string class_name() { return "magicdispenser"; }
+  std::string get_class_name() const override { return class_name(); }
+  static std::string display_name() { return _("Magic Dispenser"); }
+  std::string get_display_name() const override { return display_name(); }
+  GameObjectClasses get_class_types() const override { return MovingSprite::get_class_types().add(typeid(MagicDispenser)); }
 
 private:
   void refresh(float dt_sec) override;
-  inline bool can_be_solid() const override { return true; }
 
 private:
-  MagicSpike(const MagicSpike&) = delete;
-  MagicSpike& operator=(const MagicSpike&) = delete;
+  MagicDispenser(const MagicDispenser&) = delete;
+  MagicDispenser& operator=(const MagicDispenser&) = delete;
 };

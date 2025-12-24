@@ -26,7 +26,7 @@ class GameObject;
  * @instances A ""Dispenser"" is instantiated by placing a definition inside a level.
               It can then be accessed by its name from a script or via ""sector.name"" from the console.
  */
-class Dispenser final : public BadGuy
+class Dispenser : public BadGuy
 {
 public:
   static void register_class(ssq::VM& vm);
@@ -90,9 +90,10 @@ protected:
 
   void on_type_change(int old_type) override;
 
+  void set_correct_colgroup();
+
 private:
   void set_correct_action();
-  void set_correct_colgroup();
 
 private:
   float m_cycle;

@@ -307,6 +307,9 @@
     (class "magicspike")
     (icon "images/objects/magicspike/magicspike.png"))
   (object
+    (class "magicdispenser")
+    (icon "images/creatures/dispenser/dropper.png"))
+  (object
     (class "spotlight")
     (icon "images/objects/spotlight/spotlight_center.png"))
   (object

@@ -24,56 +24,26 @@
 #pragma once
 
 #include "object/moving_sprite.hpp"
+#include "object/magic_object.hpp"
 
-#include <memory>
-
-static constexpr float MIN_INTENSITY = 0.8f;
-static constexpr float ALPHA_SOLID = 0.7f;
-static constexpr float ALPHA_NONSOLID = 0.3f;
-static constexpr float MIN_SOLIDTIME = 1.0f;
-static constexpr float SWITCH_DELAY = 0.0f; /**< seconds to wait for stable conditions until switching solidity */
-
-class MagicBlock : public MovingSprite
+class MagicBlock final : public MagicObject<MovingSprite>
 {
 public:
-  MagicBlock(const ReaderMapping& reader, const std::string& sprite_path = "images/objects/magicblock/magicblock.sprite");
+  MagicBlock(const ReaderMapping& reader);
 
-  virtual bool collides(MovingObject& other, const CollisionHit& hit) const override;
-  virtual HitResponse collision(MovingObject& other, const CollisionHit& hit) override;
-  virtual void update(float dt_sec) override;
-  virtual void draw(DrawingContext& context) override;
+  bool collides(MovingObject& other, const CollisionHit& hit) const override;
+  HitResponse collision(MovingObject& other, const CollisionHit& hit) override;
+  void draw(DrawingContext& context) override;
   static std::string class_name() { return "magicblock"; }
-  virtual std::string get_class_name() const override { return class_name(); }
+  std::string get_class_name() const override { return class_name(); }
   static std::string display_name() { return _("Magic Tile"); }
-  virtual std::string get_display_name() const override { return display_name(); }
-  virtual GameObjectClasses get_class_types() const override { return MovingSprite::get_class_types().add(typeid(MagicBlock)); }
+  std::string get_display_name() const override { return display_name(); }
+  GameObjectClasses get_class_types() const override { return MovingSprite::get_class_types().add(typeid(MagicBlock)); }
 
-  virtual ObjectSettings get_settings() override;
-  virtual void after_editor_set() override;
-
-  virtual void on_flip(float height) override;
-
-protected:
-  virtual void refresh(float dt_sec);
-  virtual bool can_be_solid() const;
-
-protected:
-  bool m_is_solid;
-  float m_solid_time;
-  Color m_color;
-  std::shared_ptr<Color> m_light;
-  Vector m_center;
+  void on_flip(float height) override;
 
 private:
-  float m_trigger_red;
-  float m_trigger_green;
-  float m_trigger_blue;
-  float m_switch_delay; /**< seconds until switching solidity */
-  Rectf m_solid_box;
-  bool m_black;
-
-private:
-  void set_trigger_color();
+  void refresh(float dt_sec) override;
 
 private:
   MagicBlock(const MagicBlock&) = delete;

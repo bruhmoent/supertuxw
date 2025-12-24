@@ -15,52 +15,33 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "magicspike.hpp"
+#include "magicdispenser.hpp"
 
-#include "badguy/badguy.hpp"
-#include "object/player.hpp"
-
-MagicSpike::MagicSpike(const ReaderMapping& reader) :
-  MagicObject(reader, "images/objects/magicspike/magicspike.sprite")
+MagicDispenser::MagicDispenser(const ReaderMapping& reader) :
+  MagicObject<Dispenser>(reader)
 {
-  set_group(COLGROUP_TOUCHABLE);
+}
+
+// TODO: Fix the dispenser's initialization bug.
+void
+MagicDispenser::active_update(float dt_sec)
+{
+  if (m_is_solid)
+    Dispenser::active_update(dt_sec);
 }
 
 void
-MagicSpike::refresh(float dt_sec)
+MagicDispenser::refresh(float dt_sec)
 {
   if (m_is_solid)
   {
     m_solid_time += dt_sec;
     m_color.alpha = ALPHA_SOLID;
-    set_action("solid");
-    set_group(COLGROUP_TOUCHABLE);
+    Dispenser::set_correct_colgroup();
   }
   else
   {
     m_color.alpha = ALPHA_NONSOLID;
-    set_action("default");
     set_group(COLGROUP_DISABLED);
   }
-}
-
-HitResponse
-MagicSpike::collision(MovingObject& other, const CollisionHit&)
-{
-  if (!m_is_solid) return ABORT_MOVE;
-
-  auto player = dynamic_cast<Player*>(&other);
-  if (player)
-  {
-    if (player->is_invincible())
-      return ABORT_MOVE;
-
-    player->kill(false);
-  }
-
-  auto badguy = dynamic_cast<BadGuy*>(&other);
-  if (badguy)
-    badguy->kill_fall();
-
-  return FORCE_MOVE;
 }
